@@ -66,6 +66,11 @@ the certified cascade, the multi-machine scale-out, and the census itself
   component.
 - **`data/ZERO_AREA_SEEDS_excluded.csv`** — see "the zero-area edge case"
   below.
+- **`data/island_area_histogram.png`** — a log-tail-then-linear histogram
+  of every confirmed island's area. The 6 zero-area-edge-case islands
+  (3–32 tiles²) are pulled out as noted outliers so the main population —
+  all ≥ 522,416 tiles² — isn't squashed onto a few pixels; median
+  955,344 tiles², largest 7,430,080.
 - **`images/part1/`, `part2/`, `part3/`** — split into three folders purely
   because GitHub's file browser caps directory listings at 1,000 entries;
   together they're one set, and every file is a `FLOODFILL_PROOF_*.png` —
