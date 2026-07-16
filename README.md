@@ -75,7 +75,9 @@ the certified cascade, the multi-machine scale-out, and the census itself
   because GitHub's file browser caps directory listings at 1,000 entries;
   together they're one set, and every file is a `FLOODFILL_PROOF_*.png` —
   a rendered visualization of the actual flood-filled region for one
-  confirmed seed (filename encodes area and seed). For net-grid
+  confirmed seed (filename encodes area and seed). Sorted by area across
+  the split, largest first: `part1/` holds the 854 biggest islands,
+  `part2/` the next 854, `part3/` the 855 smallest. For net-grid
   visualizations, see `leader_showcase/` below instead.
 - **`images/top_400_mosaic.jpg`** — the 400 largest confirmed islands (by
   area, largest first, reading left-to-right/top-to-bottom), each one's
