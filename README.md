@@ -7,6 +7,24 @@ fully enclosed by water. Full writeup on r/factorio: [link].
 **Result**: 2,599 confirmed natural islands. Rarity: ~1 in 1,652,000. Largest
 found: seed `1925425905`, 7,430,080 tiles².
 
+## Credit where it's due
+
+This project exists because of two things I didn't build myself:
+
+- **[u/int_ua's "Peninsula Seed Finder: First Island seed, 20271579" post](https://www.reddit.com/r/factorio/comments/1twnccz/peninsula_seed_finder_first_island_seed_20271579/)**
+  on r/factorio — seeing a single hand-found natural island seed is what
+  made me want to know how many of these actually exist across the whole
+  seed space, not just find one more by hand.
+- **[ness056/fast-factorio-seed-finder](https://github.com/ness056/fast-factorio-seed-finder)**
+  — the reverse-engineered Factorio map-generation algorithms this whole
+  pipeline builds on (`code/mesh/noise.cpp`/`gradients.cpp` are lightly
+  adapted from that repo). Wube gave permission for those algorithms to be
+  shared, per that project's own README.
+
+Everything in `code/` beyond that base — the GPU noise reimplementation,
+the certified cascade, the multi-machine scale-out, and the census itself
+— is new work for this project.
+
 ## What's in here
 
 - **`code/mesh/`** — the terrain generation. `noise_gpu.py` (and
