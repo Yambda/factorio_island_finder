@@ -20,10 +20,13 @@ found: seed `1925425905`, 7,430,080 tiles².
   code) — this is what every single confirmed result in `data/` was verified
   against. `stage2_floodfill.py` is the GPU-batched approximate version used
   to pre-filter candidates before the exact check.
-- **`code/pipeline/`** — the rest of the funnel: ray-cast screening, the
-  certified "net" walk (a coarse grid over the search radius, evaluated
-  lazily), and the orchestration script (`find_islands.py`) that ties it all
+- **`code/pipeline/`** — the certified "cascade" — a coarse grid ("net") over
+  the 2,000-tile search radius, evaluated lazily, only where the search
+  actually goes (`stage1_5_cascade.py`/`stage1_5_solver.py`/`stage1_5_oracle.py`)
+  — plus the orchestration script (`find_islands.py`) that ties it all
   together and dispatches to the real flood fill for final confirmation.
+  (CLAUDE.md describes an optional ray-cast advisor stage too, but it was
+  disabled for this run — every seed went straight to the cascade.)
 - **`data/MASTER_all_fronts.csv`** — every confirmed island: seed, area
   (tiles²), and distance from spawn to the farthest point in the enclosed
   component.
@@ -34,14 +37,15 @@ found: seed `1925425905`, 7,430,080 tiles².
 
 ## The method, briefly
 
-1. A cheap ray-cast screen from spawn throws out the ~99% of seeds that
-   obviously connect to the mainland.
-2. Survivors get walked on a certified grid over a 2,000-tile disk around
-   spawn — lazily evaluated, only where the search actually goes.
-3. Anything still ambiguous falls back to a dense flood fill.
-4. Every positive result is re-checked against the real, exact flood fill
-   (`code/floodfill/stages.cpp`) before being counted — nothing in `data/`
-   is a "probably."
+1. **Mesh**: generate the elevation field (`code/mesh/`) — the same six
+   noise components, combined the same way, as the real game.
+2. **Cascade**: walk a certified grid over the 2,000-tile disk around
+   spawn — lazily evaluated, only where the search actually goes. Escapes to
+   the ring boundary confirm mainland; full enclosure of the frontier
+   confirms island; anything ambiguous defers to a denser pass.
+3. **Floodfill**: every positive result is re-checked against the real,
+   exact flood fill (`code/floodfill/stages.cpp`) before being counted —
+   nothing in `data/` is a "probably."
 
 See `CLAUDE.md` for the full design writeup, correctness invariants, and the
 project's history of subtle bugs (kept in for anyone curious how a project
