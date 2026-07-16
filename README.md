@@ -72,6 +72,11 @@ the certified cascade, the multi-machine scale-out, and the census itself
   a rendered visualization of the actual flood-filled region for one
   confirmed seed (filename encodes area and seed). For net-grid
   visualizations, see `leader_showcase/` below instead.
+- **`images/top_400_mosaic.jpg`** — the 400 largest confirmed islands (by
+  area, largest first, reading left-to-right/top-to-bottom), each one's
+  flood-fill result shrunk into a 150×150 tile and packed into a single
+  20×20 grid — one image, ~2.6MB, that gives a sense of scale and shape
+  variety across the top of the distribution at a glance.
 - **`excluded_zero_area_images/`** — proof images for the 98 seeds excluded
   per the section below (kept for the record, not counted as islands).
 - **`leader_showcase/`** — the current record holder (seed `1925425905`,
