@@ -166,11 +166,11 @@ look-alike:
   segment from all three passes layered on top. It's literally the
   complete, real set of `(seed, x, y)` queries this seed's run made
   against the mesh — nothing more, nothing invented.
-- **`composite_1234.png`** — a 2×2 grid of panels 2, 3, 4, and 5 (pass 0 →
-  pass 1 → pass 2 → flood fill), numbered 1–4 in reading order in their
-  corners. The mesh union (panel 1 standalone) isn't part of this grid —
-  the composite is specifically the cascade's growing density pass over
-  pass, ending in the flood-fill result.
+- **`composite_1234.png`** — a plain 2×2 grid, no labels: pass 0
+  (top-left), pass 1 (top-right), pass 2 (bottom-left), flood fill
+  (bottom-right) — the cascade's growing density pass over pass, ending
+  in the flood-fill result. The mesh union (panel 1 standalone) isn't
+  part of this grid.
 
 All five panels (and the composite) share the same two-color key —
 island/land `(40,230,60)` green, water/blocked `(51,83,95)` blue-gray —
