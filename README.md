@@ -68,10 +68,10 @@ the certified cascade, the multi-machine scale-out, and the census itself
   below.
 - **`images/part1/`, `part2/`, `part3/`** — split into three folders purely
   because GitHub's file browser caps directory listings at 1,000 entries;
-  together they're one set. `FLOODFILL_PROOF_*.png` files are rendered
-  visualizations of the actual flood-filled region for a given seed
-  (filename encodes area and seed). The `*_net.png` files show the
-  certified net-walk grid at two resolutions for a few example seeds.
+  together they're one set, and every file is a `FLOODFILL_PROOF_*.png` —
+  a rendered visualization of the actual flood-filled region for one
+  confirmed seed (filename encodes area and seed). For net-grid
+  visualizations, see `leader_showcase/` below instead.
 - **`excluded_zero_area_images/`** — proof images for the 98 seeds excluded
   per the section below (kept for the record, not counted as islands).
 - **`leader_showcase/`** — the current record holder (seed `1925425905`,
