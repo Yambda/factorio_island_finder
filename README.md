@@ -80,8 +80,9 @@ the certified cascade, the multi-machine scale-out, and the census itself
 - **`excluded_zero_area_images/`** — proof images for the 98 seeds excluded
   per the section below (kept for the record, not counted as islands).
 - **`leader_showcase/`** — the current record holder (seed `1925425905`,
-  7,430,080 tiles²) rendered at every mesh scale actually used in
-  production, plus its flood-fill result and ring coverage. See below.
+  7,430,080 tiles²): only the real data the pipeline actually calculated
+  at each cascade pass, plus its flood-fill result — nothing synthetic.
+  See below.
 
 ## Mesh sizes actually used
 
@@ -110,40 +111,66 @@ a real island (mainland never "closes off" a finite frontier); the cap
 exists to bound worst-case runtime, not to reject genuinely enclosed
 islands, since actual confirmed islands are many times smaller than this.
 
-### `leader_showcase/` — the current record holder at every real production scale
+### `leader_showcase/` — only what the pipeline actually calculated for this seed
 
-All five images (and the composite below) render the exact same
-5,500-tile half-extent window around spawn, so scale is directly
-comparable across every panel — margin beyond the `RING_TILES=5000`
-boundary is visible everywhere, not just in the flood-fill result. All
-five also share one color key, sampled directly from the flood-fill
-image's own pixels: island in green `(40,230,60)`, connected water in
-blue-gray `(51,83,95)`, mainland in red-brown `(180,60,40)`. Every
-image draws the same white `RING_TILES=5000` circle and yellow spawn
-crosshair, so you can see exactly how much of the disk each pass's net
-actually covers, and how much margin sits beyond it:
+The elevation field itself (`elevation_nauvis` in `code/mesh/`) has no
+edges — it's a pure function of `(seed, x, y)` computable at any tile
+coordinate, exactly like the real game's unbounded world. So the first
+version of these images (rendering a densely-colored square around
+spawn for every panel) was misleading in a specific way: it painted
+every pixel in the frame as if the pipeline had "looked at" all of it,
+when in reality the cascade only ever evaluates the exact net lines its
+lazy search visits, and the flood fill only ever visits the cells it
+actually reaches. These images now show *only* that — real evaluated
+data on an otherwise blank canvas, produced by instrumenting the actual
+production code for one seed (`1925425905`), not by re-deriving a
+look-alike:
 
-- `1_mesh_terrain.png` — the raw terrain (mesh) output around spawn,
-  island already highlighted (for consistency with the other four
-  panels) — this is what the pipeline sees before any stage does
-  anything with it.
-- `2_cascade_pass0_128tile.png` — pass 0, the coarsest cascade tier
-  (`--stage15-three-tier`'s addition): 128-tile net spacing over its
-  real domain (domain_radius_nodes=56, ±7,168 tiles — drawn out to
-  where it actually extends, even past the 5,500-tile viewport edge).
-- `3_cascade_pass1_64tile.png` / `4_cascade_pass2_32tile.png` — passes 1
-  and 2, same treatment, at their real domains (domain_radius_nodes=111
-  and 222 respectively, both ±7,104 tiles) — the net is dense enough at
-  this true scale that it reads as a fine texture rather than individual
-  gridlines, which is itself an accurate picture of how much of the disk
-  actually gets a net node.
-- `5_floodfill_result.png` — the real, exact flood-fill result
-  (reimplementing `code/floodfill/stages.cpp`'s own algorithm): island,
-  water, and mainland colored per the key above.
-- `composite_1234.png` — panels 1–4 arranged in a single 2×2 grid
-  (mesh / pass 0 / pass 1 / pass 2), each numbered in its top-left
-  corner, for a one-image side-by-side comparison of how the net
-  densifies pass over pass.
+- **Panels 2–4 (`2_cascade_pass0_128tile.png`, `3_cascade_pass1_64tile.png`,
+  `4_cascade_pass2_32tile.png`)**: every line drawn is one real
+  `(base_i, base_j, dir_code)` segment request that `stage1_5_solver.py`
+  actually sent to `stage1_5_oracle.classify_edges` for this seed during
+  that pass — captured by monkeypatching the oracle call (no source
+  changes) and running the real `stage1_5_cascade.run_cascade(...,
+  tiers=THREE_TIER_CASCADE)`. Each segment is colored by *its own real
+  verdict*: green for `EDGE_LAND`, blue-gray for `EDGE_BLOCKED` — not a
+  re-derived color. The short blue-gray "whiskers" sticking off the green
+  skeleton are exactly what they look like: the reject-graph's own
+  tested-and-blocked probe edges. Segment counts for this seed: pass 0
+  (128-tile) 476 segments, pass 1 (64-tile) 1,845, pass 2 (32-tile) 6,943
+  — all three passes CONFIRM, matching the official verdict, and nothing
+  outside those segments was ever asked about, so nothing outside them is
+  drawn.
+- **Panel 5 (`5_floodfill_result.png`)**: a real 4-connected BFS from
+  spawn over the same elevation field, colored only where the search
+  actually dequeued a cell — matching `code/floodfill/stages.cpp`'s
+  `cache.visited` semantics exactly (land cells that got kept, plus the
+  water cells checked immediately at the boundary and rejected). This
+  run's component: 464,380 cells × 16 tiles²/cell = **7,430,080 tiles²**,
+  matching the official record exactly. You'll notice small dark patches
+  *inside* the green landmass — those are interior lakes more than one
+  tile deep from any bordering land. The real algorithm never needs to
+  look past the first water tile in a direction to know that direction is
+  blocked, so it never queries deeper into a lake than that — and neither
+  does this image.
+- **Panel 1 (`1_mesh_terrain.png`)** — the mesh has no discrete "step" of
+  its own in production (it's a pure function queried on demand by
+  everything else), so rather than invent an arbitrary scan region, this
+  panel is the union of every tile the pipeline queried across all four
+  other panels: the flood-fill's visited region plus every cascade
+  segment from all three passes layered on top. It's literally the
+  complete, real set of `(seed, x, y)` queries this seed's run made
+  against the mesh — nothing more, nothing invented.
+- **`composite_1234.png`** — panels 1–4 arranged in a single 2×2 grid,
+  numbered in each corner, so the net's growing density pass over pass
+  reads as one image.
+
+All five panels (and the composite) share the same tile-to-pixel mapping
+(a 5,500-tile half-extent around spawn) and the same two-color key —
+island/land `(40,230,60)` green, water/blocked `(51,83,95)` blue-gray —
+against a neutral dark background `(22,24,28)` standing in for "never
+evaluated." There's no ring or boundary circle drawn anywhere; the shape
+of the data itself is the only thing on the canvas.
 
 ## The zero-area edge case
 
