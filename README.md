@@ -166,21 +166,22 @@ look-alike:
   segment from all three passes layered on top. It's literally the
   complete, real set of `(seed, x, y)` queries this seed's run made
   against the mesh — nothing more, nothing invented.
-- **`composite_1234.png`** — panels 2, 3, 4, and 5 (pass 0 → pass 1 →
-  pass 2 → flood fill) in a row across the top, and panel 1 (the mesh
-  union) alone underneath, all numbered in their corners — the net's
-  growing density pass over pass reads left to right, with the complete
-  query union shown separately below it.
+- **`composite_1234.png`** — a 2×2 grid of panels 2, 3, 4, and 5 (pass 0 →
+  pass 1 → pass 2 → flood fill), numbered 1–4 in reading order in their
+  corners. The mesh union (panel 1 standalone) isn't part of this grid —
+  the composite is specifically the cascade's growing density pass over
+  pass, ending in the flood-fill result.
 
-All five panels (and the composite) share the same tile-to-pixel mapping
-and the same two-color key — island/land `(40,230,60)` green,
-water/blocked `(51,83,95)` blue-gray — against a neutral dark background
-`(22,24,28)` standing in for "never evaluated." There's no ring or
-boundary circle drawn anywhere; the shape of the data itself is the only
-thing on the canvas. The crop is tight rather than an arbitrary fixed
-window: it's sized to 1.1x the actual bounding box of everything any
-panel evaluated (segments and flood-fill visits together), so the data
-fills the frame instead of floating in a mostly-empty square.
+All five panels (and the composite) share the same two-color key —
+island/land `(40,230,60)` green, water/blocked `(51,83,95)` blue-gray —
+against a neutral dark background `(22,24,28)` standing in for "never
+evaluated." There's no ring or boundary circle drawn anywhere; the shape
+of the data itself is the only thing on the canvas. The crop is centered
+on the actual bounding box of everything evaluated (segments and
+flood-fill visits together), not on spawn — spawn sits whereever it
+naturally falls within the island, not necessarily the frame's center —
+and sized to 1.1x that bounding box, so the data fills the frame instead
+of floating off-center in a mostly-empty square.
 
 ## The zero-area edge case
 
