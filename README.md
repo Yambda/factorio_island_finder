@@ -7,6 +7,21 @@ fully enclosed by water. Full writeup on r/factorio: [link].
 **Result**: 2,599 confirmed natural islands. Rarity: ~1 in 1,652,000. Largest
 found: seed `1925425905`, 7,430,080 tiles².
 
+## Hardware and performance
+
+Ran mainly on a single home PC: **AMD Ryzen 9 9950X3D** (16 cores / 32
+threads) + **NVIDIA RTX 5090** (32GB VRAM). Sustained throughput on that
+one machine was **~7,300–9,700 seeds/sec** (about 27–36x a single-threaded
+CPU-only flood fill, which runs around 273 seeds/sec). At that rate alone,
+the full 2³² seed space is roughly a 5–7 day job.
+
+To close it out faster, the last stretch of the range also ran on a
+temporary multi-cloud burst — a Google Cloud L4 instance and two rented
+Vast.ai boxes (4x and 8x RTX 5090) — pushing the combined rate as high as
+**~92,000 seeds/sec** across 14 parallel workers for the final few hours.
+None of that infrastructure is part of this repo; it was scaffolding for
+one run, not a reusable part of the pipeline.
+
 ## Credit where it's due
 
 This project exists because of two things I didn't build myself:

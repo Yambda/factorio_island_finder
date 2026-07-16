@@ -1,4 +1,4 @@
-rank,seed,score,water scale,water coverage,elevation type,farthest_tile_dist,hit_border
+rank,seed,area,water scale,water coverage,elevation type,farthest_tile_dist,hit_border
 1,37474661,0.0000,1,1,2.0,0.0,0
 2,119665281,0.0000,1,1,2.0,0.0,0
 3,135558793,0.0000,1,1,2.0,0.0,0

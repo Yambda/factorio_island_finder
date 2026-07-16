@@ -94,7 +94,7 @@ CPU_BASELINE_SEEDS_PER_SEC = 273.0
 # recorded distance is then a LOWER BOUND, not exact (should not happen for
 # a real CPU-verified island given HALF_EXTENT's own margin, but flagged
 # rather than silently assumed).
-CSV_HEADER = "rank;seed;score;water scale;water coverage;elevation type;farthest_tile_dist;hit_border"
+CSV_HEADER = "rank;seed;area;water scale;water coverage;elevation type;farthest_tile_dist;hit_border"
 
 
 def parse_args():
@@ -396,12 +396,12 @@ def parse_args():
 
 def write_csv(path, candidates, verified):
     """
-    candidates: dict seed -> (score, farthest_tile_dist, hit_border).
-                score: tiles^2 area (CPU-exact if verified, GPU stage-2
+    candidates: dict seed -> (area, farthest_tile_dist, hit_border).
+                area: tiles^2 area (CPU-exact if verified, GPU stage-2
                 estimate otherwise). farthest_tile_dist: see
                 island_extent.farthest_tile_distance; None if not computed
                 (written as empty fields, e.g. for old-format preloaded rows).
-    Rewrites the whole file, ranked by score descending -- cheap since the
+    Rewrites the whole file, ranked by area descending -- cheap since the
     candidate set is always small (islands are rare) even at millions of
     seeds screened.
     """
@@ -409,10 +409,10 @@ def write_csv(path, candidates, verified):
     tmp_path = path + ".tmp"
     with open(tmp_path, "w") as f:
         f.write(CSV_HEADER + "\n")
-        for rank, (seed, (score, farthest_dist, hit_border)) in enumerate(rows, start=1):
+        for rank, (seed, (area, farthest_dist, hit_border)) in enumerate(rows, start=1):
             dist_str = f"{farthest_dist:.1f}" if farthest_dist is not None else ""
             border_str = "" if hit_border is None else ("1" if hit_border else "0")
-            f.write(f"{rank};{seed};{score:.4f};1;1;2.0;{dist_str};{border_str}\n")
+            f.write(f"{rank};{seed};{area:.4f};1;1;2.0;{dist_str};{border_str}\n")
     os.replace(tmp_path, path)
 
 
