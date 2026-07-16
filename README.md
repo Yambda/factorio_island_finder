@@ -4,7 +4,7 @@ A GPU-accelerated search of all 4,294,967,296 possible Factorio seeds (default
 map settings, no `island` elevation type) for spawns that land on a landmass
 fully enclosed by water. Full writeup on r/factorio: [link].
 
-**Result**: 2,595 confirmed natural islands. Rarity: ~1 in 1,655,000. Largest
+**Result**: 2,599 confirmed natural islands. Rarity: ~1 in 1,652,000. Largest
 found: seed `1925425905`, 7,430,080 tiles².
 
 ## What's in here
@@ -31,12 +31,16 @@ found: seed `1925425905`, 7,430,080 tiles².
 - **`data/MASTER_all_fronts.csv`** — every confirmed island: seed, area
   (tiles²), and distance from spawn to the farthest point in the enclosed
   component.
+- **`data/ZERO_AREA_SEEDS_excluded.csv`** — see "the zero-area edge case"
+  below.
 - **`images/part1/`, `part2/`, `part3/`** — split into three folders purely
   because GitHub's file browser caps directory listings at 1,000 entries;
   together they're one set. `FLOODFILL_PROOF_*.png` files are rendered
   visualizations of the actual flood-filled region for a given seed
   (filename encodes area and seed). The `*_net.png` files show the
   certified net-walk grid at two resolutions for a few example seeds.
+- **`excluded_zero_area_images/`** — proof images for the 98 seeds excluded
+  per the section below (kept for the record, not counted as islands).
 - **`leader_showcase/`** — the current record holder (seed `1925425905`,
   7,430,080 tiles²) rendered at every mesh scale actually used in
   production, plus its flood-fill result and ring coverage. See below.
@@ -78,6 +82,40 @@ islands, since actual confirmed islands are many times smaller than this.
 - `ring_coverage.png` — the 1,400 / 2,000 / 5,000-tile reference rings, with
   the farthest enclosed tile from spawn marked (this island's farthest
   point is ~3,626 tiles out — well inside the 5,000-tile boundary).
+
+## The zero-area edge case
+
+105 seeds originally came out of the pipeline with area 0 — a small lake
+happens to sit exactly on the spawn tile, so a flood fill starting *at*
+spawn finds zero land before ever leaving water. The pipeline counted these
+as "enclosed" by the letter of the definition, but the real game would
+never actually spawn you in water — it forces you onto the nearest solid
+ground. Checking what's actually next to spawn:
+
+- **101 of the 105** turn out to just be ordinary mainland once you flood
+  fill from the nearest real land tile instead of the water-classified
+  origin — not islands at all, just an unrelated small lake sitting on an
+  otherwise normal mainland spawn. These are in
+  `data/ZERO_AREA_SEEDS_excluded.csv`, kept for the record but not counted.
+- **4 of the 105** are genuinely tiny enclosed islands: `44981135` (6
+  tiles²), `1915445000` (3 tiles²), `1931003541` (3 tiles²), and
+  `3436407377` (3 tiles²) — confirmed by direct in-game check, not just the
+  automated re-analysis. These are included in `MASTER_all_fronts.csv`
+  with their real (non-zero) area.
+
+Two more tiny islands worth flagging as genuinely marginal: `2098331609`
+(16 tiles²) and `2888143787` (32 tiles²) aren't part of the zero-area
+group — spawn itself is on land for both — but they sit right at the
+precision limit of this whole approach. Re-deriving their area with a
+simple from-scratch script gets meaningfully smaller numbers (9 and 7
+tiles² respectively) than the pipeline's own certified result, and tracing
+the boundary tiles shows elevation values within ~0.01–0.02 of the exact
+water/land threshold — far closer than this project's own measured
+worst-case GPU/CPU floating-point divergence (2.579, see `CLAUDE.md`).
+That's consistent with a few boundary tiles genuinely disagreeing between
+implementations, not a bug in either one. Both are kept in the confirmed
+count; treat their exact tile counts as less certain than everything else
+in this dataset.
 
 ## The method, briefly
 
